@@ -5,3 +5,6 @@
 
 datasets/
 results/
+.idea/
+.ipynb_checkpoints/
+wordvectors/
