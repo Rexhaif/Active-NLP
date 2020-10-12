@@ -361,8 +361,10 @@ def create_batches(dataset, batch_size, order='keep', str_words=False, tag_padde
     num_batches = np.ceil(len(dataset)/float(batch_size)).astype('int')
 
     for i in range(num_batches):
+        from pdb import set_trace
+#         set_trace()
         batch_data = newdata[(i*batch_size):min(len(dataset),(i+1)*batch_size)]
-
+        # batch_data = newdata[(i*batch_size):min(len(dataset),(i+1)*batch_size)]
         words_seqs = [itm['words'] for itm in batch_data]
         caps_seqs = [itm['caps'] for itm in batch_data]
         target_seqs = [itm['tags'] for itm in batch_data]
