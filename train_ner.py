@@ -16,6 +16,9 @@ import random
 import numpy as np
 import argparse
 
+import warnings
+warnings.filterwarnings('ignore')
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--dataset', action='store', dest='dataset', default='conll', type=str,

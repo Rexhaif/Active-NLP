@@ -9,6 +9,8 @@ np.random.seed(0)
 import torch
 import torch.nn as nn
 from .utils import *
+import warnings
+warnings.filterwarnings('ignore')
 
 
 class Trainer(object):
@@ -73,11 +75,13 @@ class Trainer(object):
                 
                 wordslen = data['wordslen']
                 charslen = data['charslen']
-                
-                score = self.model(words, tags, chars, caps, wordslen, charslen, mask, n_batches,
+                from pdb import set_trace
+#                 set_trace()
+                # def forward(self, words, tags, chars, caps, wordslen, charslen, tagsmask, usecuda=False)
+                score = self.model(words=words, tags=tags, chars=chars, caps=caps, wordslen=wordslen, charslen=charslen, tagsmask=mask, 
                                          usecuda=self.usecuda)
                 
-                loss += score.data[0]/np.sum(data['wordslen'])
+                loss += score.data.item() / np.sum(data['wordslen'])
                 score.backward()
                 
                 nn.utils.clip_grad_norm(self.model.parameters(), 5.0)
