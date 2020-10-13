@@ -188,7 +188,7 @@ else:
         char_out_channels = parameters['cnchl']
 
         model = CNN_BiLSTM_CRF(word_vocab_size, word_embedding_dim, word_hidden_dim, char_vocab_size,
-                               char_embedding_dim, char_out_channels, tag_to_id, pretrained = word_embeds)
+                               char_embedding_dim, char_out_channels, tag_to_id, pretrained = word_embeds, cap_embedding_dim=4)
         
     elif (model_name == 'CNN_BiLSTM_CRF_MC'):
         print ('CNN_BiLSTM_CRF_MC')
@@ -260,7 +260,7 @@ else:
                                 tag_to_id, sigma_prior = sigma_prior, pretrained = word_embeds)
     
     
-model.cuda()
+# model.cuda()
 learning_rate = parameters['lrate']
 print('Initial learning rate is: %s' %(learning_rate))
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)

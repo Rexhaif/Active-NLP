@@ -5,9 +5,9 @@ torch.manual_seed(0)
 import torch.nn as nn
 from torch.nn import init
 from torch.autograd import Variable
-from utils import *
+# from utils import *
 import codecs
-import cPickle
+import pickle as cPickle
 import itertools
 from collections import Counter
 

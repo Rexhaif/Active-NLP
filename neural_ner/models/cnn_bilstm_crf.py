@@ -56,7 +56,7 @@ class CNN_BiLSTM_CRF(nn.Module):
         self.decoder = DecoderCRF(word_hidden_dim*2, self.tag_to_ix, input_dropout_p=0.5)
         self.initializer.init_linear(self.decoder.hidden2tag)
         
-    def forward(self, words, tags, chars, caps, wordslen, charslen, tagsmask, usecuda=True):
+    def forward(self, words, tags, chars, caps, wordslen, charslen, tagsmask, usecuda=False):
         
         batch_size, max_len = words.size()
         
@@ -71,7 +71,7 @@ class CNN_BiLSTM_CRF(nn.Module):
         
         return score
     
-    def decode(self, words, chars, caps, wordslen, charslen, tagsmask, usecuda=True,
+    def decode(self, words, chars, caps, wordslen, charslen, tagsmask, usecuda=False,
                score_only = False):
         
         batch_size, max_len = words.size()

@@ -14,7 +14,7 @@ from .utils import *
 class Trainer(object):
     
     def __init__(self, model, optimizer, result_path, model_name, usedataset, mappings, 
-                 eval_every=1, usecuda = True):
+                 eval_every=1, usecuda = False):
         self.model = model
         self.optimizer = optimizer
         self.eval_every = eval_every
@@ -59,11 +59,11 @@ class Trainer(object):
                 mask = data['tagsmask']
                 
                 if self.usecuda:
-                    words = Variable(torch.LongTensor(words)).cuda()
-                    chars = Variable(torch.LongTensor(chars)).cuda()
-                    caps = Variable(torch.LongTensor(caps)).cuda()
-                    mask = Variable(torch.LongTensor(mask)).cuda()
-                    tags = Variable(torch.LongTensor(tags)).cuda()
+                    words = Variable(torch.LongTensor(words))#
+                    chars = Variable(torch.LongTensor(chars))#
+                    caps = Variable(torch.LongTensor(caps))#
+                    mask = Variable(torch.LongTensor(mask))#
+                    tags = Variable(torch.LongTensor(tags))#
                 else:
                     words = Variable(torch.LongTensor(words))
                     chars = Variable(torch.LongTensor(chars))
@@ -74,10 +74,10 @@ class Trainer(object):
                 wordslen = data['wordslen']
                 charslen = data['charslen']
                 
-                score = self.model(words, tags, chars, caps, wordslen, charslen, mask, n_batches,
+                score = self.model(words, tags, chars, caps, wordslen, charslen, mask,
                                          usecuda=self.usecuda)
                 
-                loss += score.data[0]/np.sum(data['wordslen'])
+                loss += score.item() / np.sum(data['wordslen'])
                 score.backward()
                 
                 nn.utils.clip_grad_norm(self.model.parameters(), 5.0)
