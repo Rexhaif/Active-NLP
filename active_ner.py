@@ -56,7 +56,7 @@ if opt.usemodel == 'CNN_BiLSTM_CRF':
     parameters['chdim'] = 25
     parameters['tgsch'] = 'iobes'
 
-    parameters['wldim'] = 200
+    parameters['wldim'] = 128
     parameters['cldim'] = 25
     parameters['cnchl'] = 25
     
@@ -205,7 +205,7 @@ if (model_name == 'CNN_BiLSTM_CRF'):
     char_out_channels = parameters['cnchl']
 
     model = CNN_BiLSTM_CRF(word_vocab_size, word_embedding_dim, word_hidden_dim, char_vocab_size,
-                           char_embedding_dim, char_out_channels, tag_to_id, cap_embedding_dim=4, pretrained = word_embeds)
+                           char_embedding_dim, char_out_channels, tag_to_id, cap_embedding_dim=0, pretrained = word_embeds)
 
 elif (model_name == 'CNN_BiLSTM_CRF_MC'):
     print ('CNN_BiLSTM_CRF_MC')
