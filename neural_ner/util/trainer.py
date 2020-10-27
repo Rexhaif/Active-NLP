@@ -49,7 +49,7 @@ class Trainer(object):
             train_batches = create_batches(train_data, batch_size= batch_size, order='random')
             n_batches = len(train_batches)
             
-            for i, index in enumerate(np.random.permutation(len(train_batches))): 
+            for i, index in enumerate(np.random.permutation(n_batches)):
                 
                 data = train_batches[index]
                 self.model.zero_grad()
@@ -107,15 +107,15 @@ class Trainer(object):
                 
                 if eval_test_train:
                     best_train_F, new_train_F, _ = self.evaluator(self.model, test_train_data, best_train_F, 
-                                                                  checkpoint_folder=checkpoint_folder)
+                                                                  checkpoint_folder=checkpoint_folder, dataset_name='test_train')
                 else:
                     best_train_F, new_train_F, _ = 0, 0, 0
                 best_dev_F, new_dev_F, save = self.evaluator(self.model, dev_data, best_dev_F,
-                                                             checkpoint_folder=checkpoint_folder)
+                                                             checkpoint_folder=checkpoint_folder, dataset_name='dev')
                 if save:
                     torch.save(self.model, os.path.join(self.model_name, checkpoint_folder, 'modelweights'))
                 best_test_F, new_test_F, _ = self.evaluator(self.model, test_data, best_test_F,
-                                                            checkpoint_folder=checkpoint_folder)
+                                                            checkpoint_folder=checkpoint_folder, dataset_name='test')
                 sys.stdout.flush()
 
                 all_F.append([new_train_F, new_dev_F, new_test_F])

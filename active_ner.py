@@ -1,6 +1,7 @@
 from __future__ import print_function
 from collections import OrderedDict
 import os
+import datetime
 import neural_ner
 from neural_ner.util import Trainer, Loader
 from neural_ner.models import CNN_BiLSTM_CRF
@@ -155,7 +156,13 @@ else:
 
 use_dataset = opt.dataset
 dataset_path = os.path.join('datasets', use_dataset)
-result_path = os.path.join(opt.result_path, use_dataset)
+
+tz = datetime.timezone(datetime.timedelta(hours=3))
+dt = datetime.datetime.now(tz=tz)
+date_path = f'{dt.date()}'
+time_path = f'{dt.time()}'.replace(':', '-').split('.')[0]
+result_path = os.path.join(opt.result_path, use_dataset, date_path, time_path)
+
 model_name = opt.usemodel
 model_load = opt.reload
 checkpoint = opt.checkpoint

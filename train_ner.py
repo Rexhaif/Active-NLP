@@ -167,6 +167,10 @@ if not os.path.exists(result_path):
 if not os.path.exists(os.path.join(result_path,model_name)):
     os.makedirs(os.path.join(result_path,model_name))
 
+with open(os.path.join(result_path,model_name, 'params'), 'wt') as fobj:
+    for param in parameters:
+        fobj.write(f'{param}:\t{parameters[param]}\n')
+
 if opt.dataset == 'conll':
     train_data, dev_data, test_data, test_train_data, mappings = loader.load_conll(dataset_path, parameters)
 elif opt.dataset == 'ontonotes':
