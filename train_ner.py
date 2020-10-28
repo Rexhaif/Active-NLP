@@ -1,4 +1,4 @@
-from __future__ import log.info_function
+from __future__ import print_function
 from collections import OrderedDict
 import os
 import datetime
