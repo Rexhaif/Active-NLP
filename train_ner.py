@@ -167,7 +167,7 @@ def main(config):
     trainer = Trainer(model, optimizer, result_path, model_name, usedataset=config.opt.dataset, mappings=mappings)
     losses, all_F = trainer.train_model(config.opt.num_epochs, train_data, dev_data, test_train_data, test_data,
                                         learning_rate=learning_rate, batch_size=config.parameters['batch_size'],
-                                        lr_decay=0.05)
+                                        lr_decay=0.05, log=log)
 
     plt.plot(losses)
     plt.savefig(os.path.join(result_path, model_name, 'lossplot.png'))
