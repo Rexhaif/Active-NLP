@@ -7,6 +7,7 @@ opt:
     reload: 0
     checkpoint: '.'
     num_epochs: 20
+    lr_decay: 0.05
 
 parameters:
     chdim: 25
