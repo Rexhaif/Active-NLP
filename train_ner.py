@@ -44,8 +44,8 @@ def main(config):
     model_load = config.opt.reload
     loader = Loader()
 
-    log.info('Model:', model_name)
-    log.info('Dataset:', use_dataset)
+    log.info(f'Model: {model_name}')
+    log.info(f'Dataset: {use_dataset}')
 
     if not os.path.exists(result_path):
         os.makedirs(result_path)
@@ -161,7 +161,7 @@ def main(config):
 
     model.cuda()
     learning_rate = config.parameters['lrate']
-    log.info('Initial learning rate is: %s' % (learning_rate))
+    log.info(f'Initial learning rate is: {learning_rate:.6f}')
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 
     trainer = Trainer(model, optimizer, result_path, model_name, usedataset=config.opt.dataset, mappings=mappings)
