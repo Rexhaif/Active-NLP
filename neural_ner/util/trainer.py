@@ -99,7 +99,8 @@ class Trainer(object):
                     loss = 0.0
                                         
             if adjust_lr:
-                self.adjust_learning_rate(self.optimizer, lr=learning_rate/(1+lr_decay*float(word_count)/len(train_data)))
+                adj_lr = learning_rate/(1+lr_decay*float(word_count)/len(train_data))
+                self.adjust_learning_rate(self.optimizer, lr=adj_lr)
             
             if epoch%self.eval_every==0:
                 

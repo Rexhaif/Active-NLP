@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import log.info_function
 from collections import OrderedDict
 import os
 import datetime
@@ -16,7 +16,8 @@ import random
 import hydra
 
 import numpy as np
-
+import logging
+log = logging.getLogger(__name__)
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -43,8 +44,8 @@ def main(config):
     model_load = config.opt.reload
     loader = Loader()
 
-    print('Model:', model_name)
-    print('Dataset:', use_dataset)
+    log.info('Model:', model_name)
+    log.info('Dataset:', use_dataset)
 
     if not os.path.exists(result_path):
         os.makedirs(result_path)
@@ -69,16 +70,16 @@ def main(config):
     char_to_id = mappings['char_to_id']
     word_embeds = mappings['word_embeds']
 
-    print('Load Complete')
+    log.info('Load Complete')
 
     if model_load:
-        print('Loading Saved Weights....................................................................')
+        log.info('Loading Saved Weights....................................................................')
         model_path = os.path.join(result_path, model_name, config.opt.checkpoint, 'modelweights')
         model = torch.load(model_path)
     else:
-        print('Building Model............................................................................')
+        log.info('Building Model............................................................................')
         if (model_name == 'CNN_BiLSTM_CRF'):
-            print('CNN_BiLSTM_CRF')
+            log.info('CNN_BiLSTM_CRF')
             word_vocab_size = len(word_to_id)
             word_embedding_dim = config.parameters.wrdim
             word_hidden_dim = config.parameters.wldim
@@ -90,7 +91,7 @@ def main(config):
                                    char_embedding_dim, char_out_channels, tag_to_id, pretrained=word_embeds)
 
         elif (model_name == 'CNN_BiLSTM_CRF_MC'):
-            print('CNN_BiLSTM_CRF_MC')
+            log.info('CNN_BiLSTM_CRF_MC')
             word_vocab_size = len(word_to_id)
             word_embedding_dim = config.parameters['wrdim']
             word_hidden_dim = config.parameters['wldim']
@@ -102,7 +103,7 @@ def main(config):
                                       char_embedding_dim, char_out_channels, tag_to_id, pretrained=word_embeds)
 
         elif (model_name == 'CNN_BiLSTM_CRF_BB'):
-            print('CNN_BiLSTM_CRF_BB')
+            log.info('CNN_BiLSTM_CRF_BB')
             word_vocab_size = len(word_to_id)
             word_embedding_dim = config.parameters['wrdim']
             word_hidden_dim = config.parameters['wldim']
@@ -116,7 +117,7 @@ def main(config):
                                       pretrained=word_embeds)
 
         elif (model_name == 'CNN_CNN_LSTM'):
-            print('CNN_CNN_LSTM')
+            log.info('CNN_CNN_LSTM')
             word_vocab_size = len(word_to_id)
             word_embedding_dim = config.parameters['wrdim']
             word_out_channels = config.parameters['wdchl']
@@ -130,7 +131,7 @@ def main(config):
                                  tag_to_id, pretrained=word_embeds)
 
         elif (model_name == 'CNN_CNN_LSTM_MC'):
-            print('CNN_CNN_LSTM_MC')
+            log.info('CNN_CNN_LSTM_MC')
             word_vocab_size = len(word_to_id)
             word_embedding_dim = config.parameters['wrdim']
             word_out_channels = config.parameters['wdchl']
@@ -144,7 +145,7 @@ def main(config):
                                     tag_to_id, pretrained=word_embeds)
 
         elif (model_name == 'CNN_CNN_LSTM_BB'):
-            print('CNN_CNN_LSTM_BB')
+            log.info('CNN_CNN_LSTM_BB')
             word_vocab_size = len(word_to_id)
             word_embedding_dim = config.parameters['wrdim']
             word_out_channels = config.parameters['wdchl']
@@ -160,7 +161,7 @@ def main(config):
 
     model.cuda()
     learning_rate = config.parameters['lrate']
-    print('Initial learning rate is: %s' % (learning_rate))
+    log.info('Initial learning rate is: %s' % (learning_rate))
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 
     trainer = Trainer(model, optimizer, result_path, model_name, usedataset=config.opt.dataset, mappings=mappings)
@@ -172,5 +173,4 @@ def main(config):
     plt.savefig(os.path.join(result_path, model_name, 'lossplot.png'))
 
 if __name__ == "__main__":
-
     main()
