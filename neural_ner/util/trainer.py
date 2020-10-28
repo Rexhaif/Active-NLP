@@ -92,7 +92,7 @@ class Trainer(object):
                 
                 if count % plot_every == 0:
                     loss /= plot_every
-                    log.info(word_count, ': ', loss)
+                    log.info(f'{word_count}:  {loss}')
                     if losses == []:
                         losses.append(loss)
                     losses.append(loss)
