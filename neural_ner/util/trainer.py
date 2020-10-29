@@ -9,12 +9,15 @@ np.random.seed(0)
 import torch
 import torch.nn as nn
 from .utils import *
-
+import warnings
+warnings.filterwarnings('ignore')
+import logging
+log = logging.getLogger(__name__)
 
 class Trainer(object):
     
     def __init__(self, model, optimizer, result_path, model_name, usedataset, mappings, 
-                 eval_every=1, usecuda = False):
+                 eval_every=1, usecuda = True):
         self.model = model
         self.optimizer = optimizer
         self.eval_every = eval_every
@@ -47,7 +50,7 @@ class Trainer(object):
             train_batches = create_batches(train_data, batch_size= batch_size, order='random')
             n_batches = len(train_batches)
             
-            for i, index in enumerate(np.random.permutation(len(train_batches))): 
+            for i, index in enumerate(np.random.permutation(n_batches)):
                 
                 data = train_batches[index]
                 self.model.zero_grad()
@@ -59,11 +62,11 @@ class Trainer(object):
                 mask = data['tagsmask']
                 
                 if self.usecuda:
-                    words = Variable(torch.LongTensor(words))#
-                    chars = Variable(torch.LongTensor(chars))#
-                    caps = Variable(torch.LongTensor(caps))#
-                    mask = Variable(torch.LongTensor(mask))#
-                    tags = Variable(torch.LongTensor(tags))#
+                    words = Variable(torch.LongTensor(words)).cuda()
+                    chars = Variable(torch.LongTensor(chars)).cuda()
+                    caps = Variable(torch.LongTensor(caps)).cuda()
+                    mask = Variable(torch.LongTensor(mask)).cuda()
+                    tags = Variable(torch.LongTensor(tags)).cuda()
                 else:
                     words = Variable(torch.LongTensor(words))
                     chars = Variable(torch.LongTensor(chars))
@@ -73,11 +76,13 @@ class Trainer(object):
                 
                 wordslen = data['wordslen']
                 charslen = data['charslen']
-                
-                score = self.model(words, tags, chars, caps, wordslen, charslen, mask,
+                from pdb import set_trace
+#                 set_trace()
+                # def forward(self, words, tags, chars, caps, wordslen, charslen, tagsmask, usecuda=False)
+                score = self.model(words=words, tags=tags, chars=chars, caps=caps, wordslen=wordslen, charslen=charslen, tagsmask=mask, 
                                          usecuda=self.usecuda)
                 
-                loss += score.item() / np.sum(data['wordslen'])
+                loss += score.data.item() / np.sum(data['wordslen'])
                 score.backward()
                 
                 nn.utils.clip_grad_norm(self.model.parameters(), 5.0)
@@ -88,14 +93,16 @@ class Trainer(object):
                 
                 if count % plot_every == 0:
                     loss /= plot_every
-                    print(word_count, ': ', loss)
+                    log.info(f'word_count:\t{word_count},\t\tloss:\t{loss}')
                     if losses == []:
                         losses.append(loss)
                     losses.append(loss)
                     loss = 0.0
                                         
             if adjust_lr:
-                self.adjust_learning_rate(self.optimizer, lr=learning_rate/(1+lr_decay*float(word_count)/len(train_data)))
+                adj_lr = learning_rate/(1+lr_decay*float(word_count)/len(train_data))
+                self.adjust_learning_rate(self.optimizer, lr=adj_lr)
+                log.info(f'lr:\t{adj_lr}')
             
             if epoch%self.eval_every==0:
                 
@@ -103,22 +110,22 @@ class Trainer(object):
                 
                 if eval_test_train:
                     best_train_F, new_train_F, _ = self.evaluator(self.model, test_train_data, best_train_F, 
-                                                                  checkpoint_folder=checkpoint_folder)
+                                                                  checkpoint_folder=checkpoint_folder, dataset_name='test_train')
                 else:
                     best_train_F, new_train_F, _ = 0, 0, 0
                 best_dev_F, new_dev_F, save = self.evaluator(self.model, dev_data, best_dev_F,
-                                                             checkpoint_folder=checkpoint_folder)
+                                                             checkpoint_folder=checkpoint_folder, dataset_name='dev')
                 if save:
                     torch.save(self.model, os.path.join(self.model_name, checkpoint_folder, 'modelweights'))
                 best_test_F, new_test_F, _ = self.evaluator(self.model, test_data, best_test_F,
-                                                            checkpoint_folder=checkpoint_folder)
+                                                            checkpoint_folder=checkpoint_folder, dataset_name='test')
                 sys.stdout.flush()
 
                 all_F.append([new_train_F, new_dev_F, new_test_F])
                 
                 self.model.train(True)
 
-            print('*'*80)
-            print('Epoch %d Complete: Time Taken %d' %(epoch ,time.time() - t))
+            log.info('*'*80)
+            log.info('Epoch %d Complete: Time Taken %d' %(epoch ,time.time() - t))
 
         return losses, all_F

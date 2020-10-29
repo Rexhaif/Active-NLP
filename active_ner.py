@@ -1,6 +1,7 @@
 from __future__ import print_function
 from collections import OrderedDict
 import os
+import datetime
 import neural_ner
 from neural_ner.util import Trainer, Loader
 from neural_ner.models import CNN_BiLSTM_CRF
@@ -12,7 +13,6 @@ from neural_ner.models import CNN_CNN_LSTM_BB
 import matplotlib.pyplot as plt
 import torch
 from active_learning import Acquisition
-# import cPickle as pkl
 import pickle as pkl
 import numpy as np
 
@@ -57,7 +57,7 @@ if opt.usemodel == 'CNN_BiLSTM_CRF':
     parameters['chdim'] = 25
     parameters['tgsch'] = 'iobes'
 
-    parameters['wldim'] = 200
+    parameters['wldim'] = 128
     parameters['cldim'] = 25
     parameters['cnchl'] = 25
     
@@ -156,7 +156,13 @@ else:
 
 use_dataset = opt.dataset
 dataset_path = os.path.join('datasets', use_dataset)
-result_path = os.path.join(opt.result_path, use_dataset)
+
+tz = datetime.timezone(datetime.timedelta(hours=3))
+dt = datetime.datetime.now(tz=tz)
+date_path = f'{dt.date()}'
+time_path = f'{dt.time()}'.replace(':', '-').split('.')[0]
+result_path = os.path.join(opt.result_path, use_dataset, date_path, time_path)
+
 model_name = opt.usemodel
 model_load = opt.reload
 checkpoint = opt.checkpoint
@@ -206,7 +212,7 @@ if (model_name == 'CNN_BiLSTM_CRF'):
     char_out_channels = parameters['cnchl']
 
     model = CNN_BiLSTM_CRF(word_vocab_size, word_embedding_dim, word_hidden_dim, char_vocab_size,
-                           char_embedding_dim, char_out_channels, tag_to_id, cap_embedding_dim=4, pretrained = word_embeds)
+                           char_embedding_dim, char_out_channels, tag_to_id, cap_embedding_dim=0, pretrained = word_embeds)
 
 elif (model_name == 'CNN_BiLSTM_CRF_MC'):
     print ('CNN_BiLSTM_CRF_MC')
@@ -287,11 +293,11 @@ else:
     acquisition_function = Acquisition(train_data, init_percent=init_percent, seed=0, 
                                            acq_mode = parameters['acqmd'])
     
-# model.cuda()
+model.cuda()
 learning_rate = parameters['lrate']
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 
-trainer = Trainer(model, optimizer, result_path, model_name, usedataset=opt.dataset, mappings= mappings, usecuda=False)
+trainer = Trainer(model, optimizer, result_path, model_name, usedataset=opt.dataset, mappings= mappings)
 
 active_train_data = [train_data[i] for i in acquisition_function.train_index]
 tokens_acquired = sum([len(x['words']) for x in active_train_data])

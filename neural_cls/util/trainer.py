@@ -1,18 +1,15 @@
 from __future__ import print_function
 from torch.autograd import Variable
 import time
-# from evaluator import Evaluator
+from neural_cls.util.evaluator import Evaluator  # 
 import sys
 import os
 import numpy as np
-
-from neural_ner.util import Evaluator
-
 np.random.seed(0)
 import torch
 torch.manual_seed(0)
 import torch.nn as nn
-# from utils import *
+from neural_cls.util.utils import *
 
 
 class Trainer(object):

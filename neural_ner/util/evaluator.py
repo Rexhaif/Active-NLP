@@ -14,7 +14,7 @@ class Evaluator(object):
         self.usecuda = usecuda
 
     def evaluate_conll(self, model, dataset, best_F, eval_script='./datasets/conll/conlleval',
-                          checkpoint_folder='.', record_confmat = False, batch_size = 32):
+                          checkpoint_folder='.', record_confmat = False, batch_size = 32, dataset_name=''):
         
         prediction = []
         save = False
@@ -59,8 +59,11 @@ class Evaluator(object):
                     confusion_matrix[true_id, pred_id] += 1
                 prediction.append('')
 
-        predf = os.path.join(self.result_path, self.model_name, checkpoint_folder ,'pred.txt')
-        scoref = os.path.join(self.result_path, self.model_name, checkpoint_folder ,'score.txt')
+        if dataset_name:
+            dataset_name += '_'
+
+        predf = os.path.join(self.result_path, self.model_name, checkpoint_folder, f'{dataset_name}pred.txt')
+        scoref = os.path.join(self.result_path, self.model_name, checkpoint_folder, f'{dataset_name}score.txt')
 
         with open(predf, 'wb') as f:
             f.write('\n'.join(prediction).encode('utf-8'))
