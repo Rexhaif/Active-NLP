@@ -5,9 +5,9 @@ from .baseRNN import baseRNN
 
 class WordEncoderRNN(baseRNN):
 
-    def __init__(self, vocab_size, embedding_size ,hidden_size, char_size, cap_size, input_dropout_p=0.5, 
-                 output_dropout_p=0, n_layers=1, bidirectional=True, rnn_cell='lstm'):
-        
+    def __init__(self, vocab_size:int, embedding_size:int ,hidden_size:int, char_size:int, cap_size:int, input_dropout_p:float=0.5,
+                 output_dropout_p:float=0, n_layers:float=1, bidirectional:bool=True, rnn_cell:str='lstm'):
+
         super(WordEncoderRNN, self).__init__(vocab_size, hidden_size, input_dropout_p, 
                                              output_dropout_p, n_layers, rnn_cell)
 

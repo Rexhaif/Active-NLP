@@ -8,6 +8,7 @@ opt:
     checkpoint: '.'
     num_epochs: 20
     lr_decay: 0.05
+    cap_embedding_dim: 4
 
 parameters:
     chdim: 25
