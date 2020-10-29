@@ -11,7 +11,8 @@ import torch.nn as nn
 from .utils import *
 import warnings
 warnings.filterwarnings('ignore')
-
+import logging
+log = logging.getLogger(__name__)
 
 class Trainer(object):
     
@@ -31,7 +32,7 @@ class Trainer(object):
             
     def train_model(self, num_epochs, train_data, dev_data, test_train_data, test_data, learning_rate,
                     checkpoint_folder='.', eval_test_train=True, plot_every=50, adjust_lr=True,
-                    batch_size = 16, lr_decay = 0.05, log=None):
+                    batch_size = 16, lr_decay = 0.05):
 
         losses = []
         loss = 0.0

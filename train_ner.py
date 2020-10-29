@@ -78,86 +78,53 @@ def main(config):
         model = torch.load(model_path)
     else:
         log.info('Building Model............................................................................')
-        if (model_name == 'CNN_BiLSTM_CRF'):
-            log.info('CNN_BiLSTM_CRF')
-            word_vocab_size = len(word_to_id)
-            word_embedding_dim = config.parameters.wrdim
-            word_hidden_dim = config.parameters.wldim
-            char_vocab_size = len(char_to_id)
-            char_embedding_dim = config.parameters.chdim
-            char_out_channels = config.parameters['cnchl']
+        log.info(config.opt.usemodel)
+        word_vocab_size = len(word_to_id)
+        char_vocab_size = len(char_to_id)
+        word_embedding_dim = config.parameters.wrdim
+        char_out_channels = config.parameters.cnchl
+        char_embedding_dim = config.parameters.chdim
 
+        if (model_name == 'CNN_BiLSTM_CRF'):
+            word_hidden_dim = config.parameters.wldim
             model = CNN_BiLSTM_CRF(word_vocab_size, word_embedding_dim, word_hidden_dim, char_vocab_size,
                                    char_embedding_dim, char_out_channels, tag_to_id, pretrained=word_embeds)
 
         elif (model_name == 'CNN_BiLSTM_CRF_MC'):
-            log.info('CNN_BiLSTM_CRF_MC')
-            word_vocab_size = len(word_to_id)
-            word_embedding_dim = config.parameters['wrdim']
             word_hidden_dim = config.parameters['wldim']
-            char_vocab_size = len(char_to_id)
-            char_embedding_dim = config.parameters['chdim']
-            char_out_channels = config.parameters['cnchl']
-
             model = CNN_BiLSTM_CRF_MC(word_vocab_size, word_embedding_dim, word_hidden_dim, char_vocab_size,
                                       char_embedding_dim, char_out_channels, tag_to_id, pretrained=word_embeds)
 
         elif (model_name == 'CNN_BiLSTM_CRF_BB'):
-            log.info('CNN_BiLSTM_CRF_BB')
-            word_vocab_size = len(word_to_id)
-            word_embedding_dim = config.parameters['wrdim']
             word_hidden_dim = config.parameters['wldim']
-            char_vocab_size = len(char_to_id)
-            char_embedding_dim = config.parameters['chdim']
-            char_out_channels = config.parameters['cnchl']
             sigma_prior = config.parameters['sigmp']
-
             model = CNN_BiLSTM_CRF_BB(word_vocab_size, word_embedding_dim, word_hidden_dim, char_vocab_size,
                                       char_embedding_dim, char_out_channels, tag_to_id, sigma_prior=sigma_prior,
                                       pretrained=word_embeds)
 
         elif (model_name == 'CNN_CNN_LSTM'):
-            log.info('CNN_CNN_LSTM')
-            word_vocab_size = len(word_to_id)
-            word_embedding_dim = config.parameters['wrdim']
             word_out_channels = config.parameters['wdchl']
-            char_vocab_size = len(char_to_id)
-            char_embedding_dim = config.parameters['chdim']
-            char_out_channels = config.parameters['cnchl']
             decoder_hidden_units = config.parameters['dchid']
-
             model = CNN_CNN_LSTM(word_vocab_size, word_embedding_dim, word_out_channels, char_vocab_size,
                                  char_embedding_dim, char_out_channels, decoder_hidden_units,
                                  tag_to_id, pretrained=word_embeds)
 
         elif (model_name == 'CNN_CNN_LSTM_MC'):
-            log.info('CNN_CNN_LSTM_MC')
-            word_vocab_size = len(word_to_id)
-            word_embedding_dim = config.parameters['wrdim']
             word_out_channels = config.parameters['wdchl']
-            char_vocab_size = len(char_to_id)
-            char_embedding_dim = config.parameters['chdim']
-            char_out_channels = config.parameters['cnchl']
             decoder_hidden_units = config.parameters['dchid']
-
             model = CNN_CNN_LSTM_MC(word_vocab_size, word_embedding_dim, word_out_channels, char_vocab_size,
                                     char_embedding_dim, char_out_channels, decoder_hidden_units,
                                     tag_to_id, pretrained=word_embeds)
 
         elif (model_name == 'CNN_CNN_LSTM_BB'):
-            log.info('CNN_CNN_LSTM_BB')
-            word_vocab_size = len(word_to_id)
-            word_embedding_dim = config.parameters['wrdim']
             word_out_channels = config.parameters['wdchl']
-            char_vocab_size = len(char_to_id)
-            char_embedding_dim = config.parameters['chdim']
-            char_out_channels = config.parameters['cnchl']
             decoder_hidden_units = config.parameters['dchid']
             sigma_prior = config.parameters['sigmp']
-
             model = CNN_CNN_LSTM_BB(word_vocab_size, word_embedding_dim, word_out_channels, char_vocab_size,
                                     char_embedding_dim, char_out_channels, decoder_hidden_units,
                                     tag_to_id, sigma_prior=sigma_prior, pretrained=word_embeds)
+        else:
+            raise KeyError
 
     model.cuda()
     learning_rate = config.parameters['lrate']
@@ -167,7 +134,7 @@ def main(config):
     trainer = Trainer(model, optimizer, result_path, model_name, usedataset=config.opt.dataset, mappings=mappings)
     losses, all_F = trainer.train_model(config.opt.num_epochs, train_data, dev_data, test_train_data, test_data,
                                         learning_rate=learning_rate, batch_size=config.parameters['batch_size'],
-                                        lr_decay=config.opt.lr_decay, log=log)
+                                        lr_decay=config.opt.lr_decay)
 
     plt.plot(losses)
     plt.savefig(os.path.join(result_path, model_name, 'lossplot.png'))
