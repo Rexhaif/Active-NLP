@@ -115,10 +115,12 @@ class Trainer(object):
                     best_train_F, new_train_F, _ = 0, 0, 0
                 best_dev_F, new_dev_F, save = self.evaluator(self.model, dev_data, best_dev_F,
                                                              checkpoint_folder=checkpoint_folder, dataset_name='dev')
+                log.info(f'best_dev_F:\t{best_dev_F},\t\tnew_dev_F:\t{new_dev_F}')
                 if save:
                     torch.save(self.model, os.path.join(self.model_name, checkpoint_folder, 'modelweights'))
                 best_test_F, new_test_F, _ = self.evaluator(self.model, test_data, best_test_F,
                                                             checkpoint_folder=checkpoint_folder, dataset_name='test')
+                log.info(f'best_test_F:\t{best_test_F},\t\tnew_test_F:\t{new_test_F}')
                 sys.stdout.flush()
 
                 all_F.append([new_train_F, new_dev_F, new_test_F])
