@@ -1,16 +1,13 @@
-opt:
+parameters:
     dataset: 'conll'
     result_path: 'neural_ner/results/'
     usemodel: 'CNN_BiLSTM_CRF'
-    worddim: 100
-    pretrnd: 'wordvectors/glove.6B.100d.txt'
+#    pretrnd: 'wordvectors/glove.6B.100d.txt'
     reload: 0
     checkpoint: '.'
     num_epochs: 20
     lr_decay: 0.05
     cap_embedding_dim: 4
-
-parameters:
     chdim: 25
     cpdim: 0
     dpout: 0.5
@@ -22,6 +19,6 @@ parameters:
     cnchl: 25
     lrate: 0.015
     wldim: 200
-    model: ''
-    wrdim: ''
-    ptrnd: ''
+#    model: ''
+    wrdim: 100
+    ptrnd: 'wordvectors/glove.6B.100d.txt'
