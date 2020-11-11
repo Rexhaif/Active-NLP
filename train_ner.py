@@ -127,7 +127,7 @@ def main(config):
     log.info(f'Initial learning rate is: {learning_rate:.6f}')
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 
-    trainer = Trainer(model, optimizer, result_path, config.parameters.usemodel, usedataset=config.parameters.dataset, mappings=mappings)
+    trainer = Trainer(model, optimizer, result_path, config.parameters.usemodel, mappings=mappings)
     losses, all_F = trainer.train_model(config.parameters.num_epochs, train_data, dev_data, test_train_data, test_data,
                                         learning_rate=learning_rate, batch_size=config.parameters.batch_size,
                                         lr_decay=config.parameters.lr_decay)

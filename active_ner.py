@@ -297,7 +297,7 @@ model.cuda()
 learning_rate = parameters['lrate']
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 
-trainer = Trainer(model, optimizer, result_path, model_name, usedataset=opt.dataset, mappings= mappings)
+trainer = Trainer(model, optimizer, result_path, model_name, mappings=mappings)
 
 active_train_data = [train_data[i] for i in acquisition_function.train_index]
 tokens_acquired = sum([len(x['words']) for x in active_train_data])
