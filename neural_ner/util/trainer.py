@@ -100,7 +100,7 @@ class Trainer(object):
                                         
             if adjust_lr:
                 adj_lr = learning_rate/(1+lr_decay*float(word_count)/len(train_data))
-                print(f'word_count:\t{word_count},\t\ttrain_data:\t{train_data}')
+                print(f'word_count:\t{word_count},\t\tlength of a train_data:\t{len(train_data)}')
                 self.adjust_learning_rate(self.optimizer, lr=adj_lr)
                 log.info(f'lr:\t{adj_lr}, anneal_coeff:\t{1/(1+lr_decay*float(word_count)/len(train_data))}')
             
