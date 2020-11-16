@@ -122,6 +122,8 @@ def main(config):
 
     model = make_model(config, mappings, result_path)
 
+    log.info(model)
+
     model.cuda()
     learning_rate = config.parameters.lrate
     log.info(f'Initial learning rate is: {learning_rate:.6f}')
