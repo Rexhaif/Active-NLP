@@ -41,7 +41,7 @@ def make_model(config, mappings, result_path, device='cpu'):
             word_hidden_dim = config.parameters.wldim
             model = CNN_BiLSTM_CRF(word_vocab_size, word_embedding_dim, word_hidden_dim, char_vocab_size,
                                    char_embedding_dim, char_out_channels, tag_to_id,
-                                   cap_embedding_dim=config.parameters.cap_embedding_dim, pretrained=word_embeds)
+                                   cap_embedding_dim=config.parameters.cap_embedding_dim, pretrained=word_embeds, device=device)
 
         elif (config.parameters.usemodel == 'CNN_BiLSTM_CRF_MC'):
             word_hidden_dim = config.parameters['wldim']

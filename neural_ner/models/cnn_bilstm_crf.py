@@ -15,7 +15,7 @@ class CNN_BiLSTM_CRF(nn.Module):
     
     def __init__(self, word_vocab_size:int, word_embedding_dim:int, word_hidden_dim:int, char_vocab_size:int,
                  char_embedding_dim:int, char_out_channels:int, tag_to_id:dict, cap_input_dim:int=4 ,
-                 cap_embedding_dim:int=0, pretrained=None):
+                 cap_embedding_dim:int=0, pretrained=None, device='cpu'):
         
         super(CNN_BiLSTM_CRF, self).__init__()
         
@@ -53,7 +53,7 @@ class CNN_BiLSTM_CRF(nn.Module):
             
         self.initializer.init_lstm(self.word_encoder.rnn)
         
-        self.decoder = DecoderCRF(word_hidden_dim*2, self.tag_to_ix, input_dropout_p=0.5)
+        self.decoder = DecoderCRF(word_hidden_dim*2, self.tag_to_ix, input_dropout_p=0.5, device=device)
         self.initializer.init_linear(self.decoder.hidden2tag)
         
     def forward(self, words, tags, chars, caps, wordslen, charslen, tagsmask, device=True):
