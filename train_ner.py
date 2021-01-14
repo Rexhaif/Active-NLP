@@ -19,7 +19,7 @@ import warnings
 warnings.filterwarnings('ignore')
 log = logging.getLogger(__name__)
 
-def make_model(config, mappings, result_path):
+def make_model(config, mappings, result_path, device='cpu'):
     word_to_id = mappings['word_to_id']
     tag_to_id = mappings['tag_to_id']
     char_to_id = mappings['char_to_id']
@@ -83,6 +83,7 @@ def make_model(config, mappings, result_path):
 @hydra.main(config_path=os.environ['HYDRA_CONFIG_PATH'])  # os.environ['HYDRA_CONFIG_PATH']
 def main(config):
     os.chdir(hydra.utils.get_original_cwd())
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     use_dataset = config.parameters.dataset
     dataset_path = os.path.join('datasets', use_dataset)
@@ -124,12 +125,12 @@ def main(config):
 
     log.info(model)
 
-    model.cuda()
+    model.to(device)
     learning_rate = config.parameters.lrate
     log.info(f'Initial learning rate is: {learning_rate:.6f}')
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 
-    trainer = Trainer(model, optimizer, result_path, config.parameters.usemodel, mappings=mappings)
+    trainer = Trainer(model, optimizer, result_path, config.parameters.usemodel, mappings=mappings, device=device)
     losses, all_F = trainer.train_model(config.parameters.num_epochs, train_data, dev_data, test_train_data, test_data,
                                         learning_rate=learning_rate, batch_size=config.parameters.batch_size,
                                         lr_decay=config.parameters.lr_decay)

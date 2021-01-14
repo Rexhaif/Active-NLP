@@ -7,7 +7,7 @@ parameters:
     checkpoint: '.'
     num_epochs: 20
     lr_decay: 0.05
-    cap_embedding_dim: 4
+    cap_embedding_dim: 3
     chdim: 25
     cpdim: 0
     dpout: 0.5

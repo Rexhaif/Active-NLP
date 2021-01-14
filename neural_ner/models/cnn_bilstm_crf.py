@@ -56,7 +56,7 @@ class CNN_BiLSTM_CRF(nn.Module):
         self.decoder = DecoderCRF(word_hidden_dim*2, self.tag_to_ix, input_dropout_p=0.5)
         self.initializer.init_linear(self.decoder.hidden2tag)
         
-    def forward(self, words, tags, chars, caps, wordslen, charslen, tagsmask, usecuda=True):
+    def forward(self, words, tags, chars, caps, wordslen, charslen, tagsmask, device=True):
         
         batch_size, max_len = words.size()
         
@@ -67,12 +67,11 @@ class CNN_BiLSTM_CRF(nn.Module):
         
         word_features = self.word_encoder(words, char_features, cap_features, wordslen)
         
-        score = self.decoder(word_features, tags, tagsmask, usecuda=usecuda)
+        score = self.decoder(word_features, tags, tagsmask)  # , device=device
         
         return score
     
-    def decode(self, words, chars, caps, wordslen, charslen, tagsmask, usecuda=True,
-               score_only = False):
+    def decode(self, words, chars, caps, wordslen, charslen, tagsmask, score_only = False):
         
         batch_size, max_len = words.size()
         
@@ -84,8 +83,8 @@ class CNN_BiLSTM_CRF(nn.Module):
         word_features = self.word_encoder(words, char_features, cap_features, wordslen)
         
         if score_only:
-            score = self.decoder.decode(word_features, tagsmask, usecuda=usecuda, 
+            score = self.decoder.decode(word_features, tagsmask,
                                         score_only = True)
             return score
-        score, tag_seq = self.decoder.decode(word_features, tagsmask, usecuda=usecuda)
+        score, tag_seq = self.decoder.decode(word_features, tagsmask)
         return score, tag_seq

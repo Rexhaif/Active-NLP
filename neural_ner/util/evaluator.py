@@ -6,12 +6,12 @@ import torch
 from torch.autograd import Variable
 
 class Evaluator(object):
-    def __init__(self, result_path, model_name, mappings, usecuda=True):
+    def __init__(self, result_path, model_name, mappings, device='cpu'):
         self.result_path = result_path
         self.model_name = model_name
         self.tag_to_id = mappings['tag_to_id']
         self.id_to_tag = mappings['id_to_tag']
-        self.usecuda = usecuda
+        self.device = device
 
     def evaluate_conll(self, model, dataset, best_F, eval_script='./datasets/conll/conlleval',
                           checkpoint_folder='.', record_confmat = False, batch_size = 32, dataset_name=''):
@@ -31,23 +31,17 @@ class Evaluator(object):
             caps = data['caps']
             mask = data['tagsmask']
 
-            if self.usecuda:
-                words = Variable(torch.LongTensor(words)).cuda()
-                chars = Variable(torch.LongTensor(chars)).cuda()
-                caps = Variable(torch.LongTensor(caps)).cuda()
-                mask = Variable(torch.LongTensor(mask)).cuda()
-            else:
-                words = Variable(torch.LongTensor(words))
-                chars = Variable(torch.LongTensor(chars))
-                caps = Variable(torch.LongTensor(caps))
-                mask = Variable(torch.LongTensor(mask))
+            words = Variable(torch.LongTensor(words)).to(self.device)
+            chars = Variable(torch.LongTensor(chars)).to(self.device)
+            caps = Variable(torch.LongTensor(caps)).to(self.device)
+            mask = Variable(torch.LongTensor(mask)).to(self.device)
 
             wordslen = data['wordslen']
             charslen = data['charslen']
             
             str_words = data['str_words']
             
-            _, out = model.decode(words, chars, caps, wordslen, charslen, mask, usecuda = self.usecuda)
+            _, out = model.decode(words, chars, caps, wordslen, charslen, mask)  # , usecuda = self.device
                         
             ground_truth_id = data['tags']
             predicted_id = out            
