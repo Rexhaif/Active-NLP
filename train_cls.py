@@ -14,11 +14,11 @@ import argparse
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--dataset', action='store', dest='dataset', default='mareview', type=str,
+parser.add_argument('--dataset', action='store', dest='dataset', default='trec', type=str,
                     help='Dataset to be Used')
 parser.add_argument('--result_path', action='store', dest='result_path', default='neural_cls/results/',
                     type=str, help='Path to Save/Load Result')
-parser.add_argument('--usemodel', default='CNN', type=str, dest='usemodel',
+parser.add_argument('--usemodel', default='BiLSTM', type=str, dest='usemodel',
                     help='Model to Use')
 parser.add_argument('--worddim', default=300, type=int, dest='worddim',
                     help="Word Embedding Dimension")

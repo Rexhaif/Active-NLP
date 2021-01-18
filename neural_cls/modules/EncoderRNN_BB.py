@@ -138,7 +138,10 @@ class RNNBase_BB(nn.Module):
         
         is_packed = isinstance(input, PackedSequence)
         if is_packed:
-            input, batch_sizes = input
+#             import pdb;pdb.set_trace()
+            batch_sizes = input[1]
+            input = input[0]
+#             input, batch_sizes = input
             max_batch_size = batch_sizes[0]
         else:
             batch_sizes = None

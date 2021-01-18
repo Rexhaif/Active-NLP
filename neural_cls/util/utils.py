@@ -42,6 +42,7 @@ def augment_with_pretrained(dictionary, ext_emb_path, words):
     `words` (typically the words in the development and test sets.)
     """
     print('Loading pretrained embeddings from %s...' % ext_emb_path)
+#     import pdb; pdb.set_trace()
     assert os.path.isfile(ext_emb_path)
 
     # Load pretrained embeddings from file

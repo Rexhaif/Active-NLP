@@ -35,7 +35,8 @@ class BiLSTM(nn.Module):
         self.linear = nn.Linear(hidden_size, output_size)
         self.lossfunc = nn.CrossEntropyLoss()
         
-    def forward(self, words, tags, wordslen, usecuda=True):
+              #(self, words, tags, tagset_size, wordslen, n_batches, n_samples=3, usecuda=True)        
+    def forward(self, words, tags, tagset_size, wordslen, n_batches, n_samples=3, usecuda=True)  :
         
         batch_size, max_len = words.size()
         word_features = self.word_encoder(words, wordslen)

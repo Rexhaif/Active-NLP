@@ -59,7 +59,7 @@ class BiLSTM_BB(nn.Module):
             onehottags = Variable(torch.zeros(batch_size, tagset_size))
         onehottags.scatter_(1, tags.unsqueeze(1), 1)
                 
-        for _ in xrange(n_samples):
+        for _ in range(n_samples):
             output = self.forward_pass(words, wordslen, usecuda = usecuda)
             sample_log_pw, sample_log_qw = self.word_encoder.get_lpw_lqw()
             sample_log_likelihood = log_gaussian(onehottags, output, self.sigma_prior).sum()
