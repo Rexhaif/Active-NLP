@@ -64,8 +64,8 @@ class Trainer(object):
                 
                 wordslen = data['wordslen']
                 
+                import pdb;pdb.set_trace()
                 score = self.model(words, tags, self.tagset_size, wordslen, n_batches, 3, usecuda=self.usecuda)
-#                 import pdb;pdb.set_trace()
                 loss += score.data.item()/len(wordslen)
                 score.backward()
                 
