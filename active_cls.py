@@ -23,7 +23,7 @@ parser.add_argument('--dataset', action='store', dest='dataset', default='trec',
                     help='Dataset to be Used')
 parser.add_argument('--result_path', action='store', dest='result_path', default='neural_cls/results/',
                     type=str, help='Path to Save/Load Result')
-parser.add_argument('--usemodel', default='BiLSTM_BB', type=str, dest='usemodel',
+parser.add_argument('--usemodel', default='CNN_BB', type=str, dest='usemodel',
                     help='Model to Use')
 parser.add_argument('--worddim', default=300, type=int, dest='worddim',
                     help="Word Embedding Dimension")
@@ -53,7 +53,7 @@ if opt.usemodel == 'CNN' and opt.dataset == 'trec':
     
     parameters['lrate'] = 0.001
     parameters['batch_size'] = 50
-    parameters['opsiz'] = 6
+    parameters['opsiz'] = 7
     parameters['acqmd'] = 'd'
     
 elif opt.usemodel == 'CNN' and opt.dataset == 'mareview':
@@ -73,7 +73,7 @@ elif opt.usemodel == 'BiLSTM' and opt.dataset == 'trec':
     
     parameters['lrate'] = 0.001
     parameters['batch_size'] = 50
-    parameters['opsiz'] = 6
+    parameters['opsiz'] = 7
     parameters['acqmd'] = 'd'
 
 elif opt.usemodel == 'BiLSTM' and opt.dataset == 'mareview':
@@ -93,7 +93,7 @@ elif opt.usemodel == 'CNN_MC' and opt.dataset == 'trec':
     
     parameters['lrate'] = 0.001
     parameters['batch_size'] = 50
-    parameters['opsiz'] = 6
+    parameters['opsiz'] = 7
     parameters['acqmd'] = 'm'
     
 elif opt.usemodel == 'CNN_MC' and opt.dataset == 'mareview':
@@ -113,7 +113,7 @@ elif opt.usemodel == 'BiLSTM_MC' and opt.dataset == 'trec':
     
     parameters['lrate'] = 0.001
     parameters['batch_size'] = 50
-    parameters['opsiz'] = 6
+    parameters['opsiz'] = 7
     parameters['acqmd'] = 'm'
 
 elif opt.usemodel == 'BiLSTM_MC' and opt.dataset == 'mareview':
@@ -132,7 +132,7 @@ elif opt.usemodel == 'CNN_BB' and opt.dataset == 'trec':
     
     parameters['lrate'] = 0.001
     parameters['batch_size'] = 50
-    parameters['opsiz'] = 6
+    parameters['opsiz'] = 7
     parameters['sigmp'] = float(np.exp(-3))
 
     parameters['acqmd'] = 'b'
@@ -325,11 +325,11 @@ for acquire_percent in acquisition_strat:
     
     pkl.dump(acquisition_function, open(os.path.join(checkpoint_path,'acquisition2.p'),'wb'))
     
-    print ('*'*80)
+    print ('*'*100)
     saved_epoch = np.argmax(np.array([item[1] for item in all_F]))
     print ('Budget Exhausted: %d, Best F on Train %.3f, Best F on Test %.3f' %(sentences_acquired,
                                                     all_F[saved_epoch][0], all_F[saved_epoch][1]))
-    print ('*'*80)
+    print ('*'*100)
     
     active_train_data = [train_data[i] for i in acquisition_function.train_index]
     sentences_acquired = len(acquisition_function.train_index)

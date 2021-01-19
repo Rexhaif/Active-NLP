@@ -18,7 +18,7 @@ parser.add_argument('--dataset', action='store', dest='dataset', default='trec',
                     help='Dataset to be Used')
 parser.add_argument('--result_path', action='store', dest='result_path', default='neural_cls/results/',
                     type=str, help='Path to Save/Load Result')
-parser.add_argument('--usemodel', default='BiLSTM', type=str, dest='usemodel',
+parser.add_argument('--usemodel', default='CNN', type=str, dest='usemodel',
                     help='Model to Use')
 parser.add_argument('--worddim', default=300, type=int, dest='worddim',
                     help="Word Embedding Dimension")
@@ -44,7 +44,7 @@ if opt.usemodel == 'BiLSTM' and opt.dataset == 'trec':
     
     parameters['lrate'] = 0.001
     parameters['batch_size'] = 50
-    parameters['opsiz'] = 6
+    parameters['opsiz'] = 7
 
 elif opt.usemodel == 'BiLSTM' and opt.dataset == 'mareview':
     parameters['dpout'] = 0.5
@@ -58,11 +58,11 @@ elif opt.usemodel == 'BiLSTM' and opt.dataset == 'mareview':
 elif opt.usemodel == 'CNN' and opt.dataset == 'trec':
     parameters['dpout'] = 0.5
     parameters['wlchl'] = 100
-    parameters['nepch'] = 10
+    parameters['nepch'] = 15
     
     parameters['lrate'] = 0.001
     parameters['batch_size'] = 50
-    parameters['opsiz'] = 6
+    parameters['opsiz'] = 7
     
 elif opt.usemodel == 'CNN' and opt.dataset == 'mareview':
     parameters['dpout'] = 0.5
@@ -79,7 +79,7 @@ elif opt.usemodel == 'CNN_BB' and opt.dataset == 'trec':
     
     parameters['lrate'] = 0.001
     parameters['batch_size'] = 50
-    parameters['opsiz'] = 6
+    parameters['opsiz'] = 7
     parameters['sigmp'] = float(np.exp(-3))
     
 elif opt.usemodel == 'CNN_BB' and opt.dataset == 'mareview':

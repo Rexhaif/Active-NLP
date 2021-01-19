@@ -34,9 +34,10 @@ class CNN(nn.Module):
         self.linear = nn.Linear(hidden_size, output_size)
         
         self.lossfunc = nn.CrossEntropyLoss()
+        
               #(self, words, tags, tagset_size, wordslen, n_batches, n_samples=3, usecuda=True)
     def forward(self, words, tags, tagset_size, wordslen, n_batches, n_samples=3, usecuda=True):
-        
+#         from pdb import set_trace;set_trace()
         batch_size, max_len = words.size()
         word_features = self.word_encoder(words, wordslen)
         word_features = self.dropout(word_features)

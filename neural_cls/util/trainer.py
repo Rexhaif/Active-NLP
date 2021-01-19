@@ -64,7 +64,7 @@ class Trainer(object):
                 
                 wordslen = data['wordslen']
                 
-                import pdb;pdb.set_trace()
+#                 import pdb;pdb.set_trace()
                 score = self.model(words, tags, self.tagset_size, wordslen, n_batches, 3, usecuda=self.usecuda)
                 loss += score.data.item()/len(wordslen)
                 score.backward()
@@ -97,16 +97,16 @@ class Trainer(object):
                 best_test_F, new_test_F, save = self.evaluator(self.model, test_data, best_test_F,
                                                              checkpoint_folder=checkpoint_folder)
                 if save:
-                    print ('*'*80)
+                    print ('*'*100)
                     print ('Saving Best Weights')
-                    print ('*'*80)
+                    print ('*'*100)
                     torch.save(self.model, os.path.join(self.model_name, checkpoint_folder, 'modelweights'))
                     
                 sys.stdout.flush()
                 all_F.append([new_train_F, new_test_F])
                 self.model.train(True)
 
-            print('*'*80)
+            print('*'*100)
             print('Epoch %d Complete: Time Taken %d' %(epoch ,time.time() - t))
 
         return losses, all_F

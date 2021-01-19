@@ -4,6 +4,8 @@ import torch
 from .utils import *
 import torch
 from torch.autograd import Variable
+from pdb import set_trace
+from sklearn.metrics import f1_score
 
 class Evaluator(object):
     def __init__(self, result_path, model_name, usecuda=True):
@@ -12,7 +14,6 @@ class Evaluator(object):
         self.usecuda = usecuda
 
     def evaluate(self, model, dataset, best_F, checkpoint_folder='.', batch_size = 32):
-        
         predicted_ids = []
         ground_truth_ids = []
         
@@ -36,14 +37,19 @@ class Evaluator(object):
             
             ground_truth_ids.extend(data['tags'])
             predicted_ids.extend(out)
+#         set_trace()
 
         new_F = np.mean(np.array(ground_truth_ids) == np.array(predicted_ids))
+        f1_weighted = f1_score(np.array(ground_truth_ids), np.array(predicted_ids),average = 'weighted' )
+        f1_macro = f1_score(np.array(ground_truth_ids), np.array(predicted_ids),average = 'macro' )
+        
         if new_F > best_F:
             best_F = new_F
             save = True
         
-        print('*'*80)
-        print('Accuracy: %f, Best Accuracy: %f' %(new_F, best_F))
-        print('*'*80)
+        print('*'*100)
+        print(f'Accuracy: {new_F:.8f}, Best Accuracy: {best_F:.8f}, F1 weighted: {f1_weighted:.8f}, F1 macro: {f1_macro:.8f}')
+        
+        print('*'*100)
             
         return best_F, new_F, save
