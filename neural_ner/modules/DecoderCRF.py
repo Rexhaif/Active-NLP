@@ -98,7 +98,7 @@ class DecoderCRF(nn.Module):
         
         return probs_score.data.cpu().numpy(), decoded_tags
     
-    def crf_forward(self, feats, mask):
+    def crf_forward(self, feats, mask, usecuda=True):
         
         batch_size, sequence_length, num_tags = feats.size()
         
@@ -113,7 +113,7 @@ class DecoderCRF(nn.Module):
             emit_score = feats[i].view(batch_size, num_tags, 1)
             transition_scores = self.transitions.view(1, num_tags, num_tags)
             broadcast_forward = forward_var.view(batch_size, 1, num_tags)
-            tag_var = broadcast_forward + transition_scores.to(self.device) + emit_score.to(self.device)
+            tag_var = broadcast_forward + transition_scores + emit_score 
             
             forward_var = (log_sum_exp(tag_var, dim = 2) * mask[i].view(batch_size, 1) +
                             forward_var * (1 - mask[i]).view(batch_size, 1))
