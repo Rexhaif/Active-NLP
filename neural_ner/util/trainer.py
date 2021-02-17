@@ -16,14 +16,14 @@ log = logging.getLogger(__name__)
 
 class Trainer(object):
     
-    def __init__(self, model, optimizer, result_path, model_name, mappings, eval_every=1, device='cpu'):
+    def __init__(self, model, optimizer, result_path, model_name, mappings, eval_every=1, usecuda=True):
         self.model = model
         self.optimizer = optimizer
         self.eval_every = eval_every
         self.model_name = os.path.join(result_path, model_name)
-        self.device = device
+        self.usecuda = usecuda
         
-        self.evaluator = Evaluator(result_path, model_name, mappings, device=device).evaluate_conll
+        self.evaluator = Evaluator(result_path, model_name, mappings).evaluate_conll
     
     def adjust_learning_rate(self, optimizer, lr):
         for param_group in optimizer.param_groups:
@@ -60,20 +60,26 @@ class Trainer(object):
                 caps = data['caps']
                 mask = data['tagsmask']
                 
-
-                words = Variable(torch.LongTensor(words)).to(self.device)
-                chars = Variable(torch.LongTensor(chars)).to(self.device)
-                caps = Variable(torch.LongTensor(caps)).to(self.device)
-                mask = Variable(torch.LongTensor(mask)).to(self.device)
-                tags = Variable(torch.LongTensor(tags)).to(self.device)
-
+                if self.usecuda:
+                    words = Variable(torch.LongTensor(words)).cuda()
+                    chars = Variable(torch.LongTensor(chars)).cuda()
+                    caps = Variable(torch.LongTensor(caps)).cuda()
+                    mask = Variable(torch.LongTensor(mask)).cuda()
+                    tags = Variable(torch.LongTensor(tags)).cuda()
+                else:
+                    words = Variable(torch.LongTensor(words))
+                    chars = Variable(torch.LongTensor(chars))
+                    caps = Variable(torch.LongTensor(caps))
+                    mask = Variable(torch.LongTensor(mask))
+                    tags = Variable(torch.LongTensor(tags))
                 
                 wordslen = data['wordslen']
                 charslen = data['charslen']
                 from pdb import set_trace
 #                 set_trace()
                 # def forward(self, words, tags, chars, caps, wordslen, charslen, tagsmask, usecuda=False)
-                score = self.model(words=words, tags=tags, chars=chars, caps=caps, wordslen=wordslen, charslen=charslen, tagsmask=mask)  # usecuda=self.device
+                score = self.model(words=words, tags=tags, chars=chars, caps=caps, wordslen=wordslen, charslen=charslen, tagsmask=mask, 
+                                         usecuda=self.usecuda)
                 
                 loss += score.data.item() / np.sum(data['wordslen'])
                 score.backward()

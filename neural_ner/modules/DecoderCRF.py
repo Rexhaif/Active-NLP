@@ -6,7 +6,7 @@ from neural_ner.util.utils import *
 
 class DecoderCRF(nn.Module):
 
-    def __init__(self, input_dimension, tag_to_ix, input_dropout_p=0.5, device='cpu'):
+    def __init__(self, input_dimension, tag_to_ix, input_dropout_p=0.5):
         
         super(DecoderCRF, self).__init__()
         
@@ -19,7 +19,6 @@ class DecoderCRF(nn.Module):
         self.transitions = nn.Parameter(torch.zeros(self.tagset_size, self.tagset_size))
         self.transitions.data[tag_to_ix[START_TAG], :] = -10000
         self.transitions.data[:, tag_to_ix[STOP_TAG]] = -10000
-        self.device=device
     
     def viterbi_decode(self, feats, mask ,usecuda = True, score_only= False):
     
@@ -32,14 +31,19 @@ class DecoderCRF(nn.Module):
         
         backpointers = []
         
-        all_forward_vars = Variable(torch.Tensor(sequence_len, batch_size, num_tags).fill_(0.)).to(self.device)
-        sum_all_forward_vars = Variable(torch.Tensor(sequence_len, batch_size, num_tags).fill_(0.)).to(self.device)
+        all_forward_vars = Variable(torch.Tensor(sequence_len, 
+                                    batch_size, num_tags).fill_(0.)).cuda()
+        sum_all_forward_vars = Variable(torch.Tensor(sequence_len, 
+                                    batch_size, num_tags).fill_(0.)).cuda()
         
         init_vars = torch.Tensor(batch_size, num_tags).fill_(-10000.)
         init_vars[:,self.tag_to_ix[START_TAG]] = 0.
-        forward_var = Variable(init_vars).to(self.device)
-        sum_forward_var = Variable(init_vars).to(self.device)
-
+        if usecuda:
+            forward_var = Variable(init_vars).cuda()
+            sum_forward_var = Variable(init_vars).cuda()
+        else:
+            forward_var = Variable(init_vars)
+            sum_forward_var = Variable(init_vars)
         
         for i in range(sequence_len):
             
@@ -107,7 +111,10 @@ class DecoderCRF(nn.Module):
         
         init_alphas = torch.Tensor(batch_size, num_tags).fill_(-10000.)
         init_alphas[:,self.tag_to_ix[START_TAG]] = 0.
-        forward_var = Variable(init_alphas).to(self.device)
+        if usecuda:
+            forward_var = Variable(init_alphas).cuda()
+        else:
+            forward_var = Variable(init_alphas)
         
         for i in range(sequence_length):
             emit_score = feats[i].view(batch_size, num_tags, 1)
@@ -175,14 +182,14 @@ class DecoderCRF(nn.Module):
         score, tag_seq = self.viterbi_decode(features, mask, usecuda=usecuda)
         return score, tag_seq
     
-    def forward(self, input_var, tags, mask=None):
+    def forward(self, input_var, tags, mask=None, usecuda=True):
         
         if mask is None:
             mask = Variable(torch.ones(*tags.size()).long())
         
         input_var = self.dropout(input_var)
         features = self.hidden2tag(input_var)
-        forward_score = self.crf_forward(features, mask)
-        ground_score = self.score_sentence(features, tags, mask)
+        forward_score = self.crf_forward(features, mask, usecuda=usecuda)
+        ground_score = self.score_sentence(features, tags, mask, usecuda=usecuda)
         
         return torch.sum(forward_score-ground_score)
