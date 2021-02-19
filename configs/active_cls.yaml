@@ -4,6 +4,7 @@ parameters:
   usemodel: CNN
   worddim: 300
   pretrnd: wordvectors/mts_dataset_300.vec
+  ptrnd: wordvectors/mts_dataset_300.vec
   reload: 0
   checkpoint: "."
   initdata: 2

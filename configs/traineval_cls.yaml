@@ -1,14 +1,13 @@
 parameters:
   dataset: trec
   result_path: 'neural_cls/results/'
-  usemodel: BiLSTM
+  model: BiLSTM
   worddim: 300
   pretrnd: wordvectors/mts_dataset_300.vec
   ptrnd: wordvectors/mts_dataset_300.vec
   reload: 0
   checkpoint: "."
   initdata: 2
-  model:
   opsiz:
   wrdim: 300
   wlchl:
@@ -18,5 +17,7 @@ parameters:
   nepch: 15
   lrate: 0.001
   batch_size: 50
+opt:
+  reload: 0
 
 #  acquiremethod: random

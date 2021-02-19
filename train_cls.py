@@ -19,77 +19,53 @@ log = logging.getLogger(__name__)
 
 @hydra.main(config_path=os.environ['HYDRA_CONFIG_PATH'])
 def main(config):
-    # global parser, config.parameters, result_path, loader, num_epochs
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', action='store', dest='dataset', default='trec', type=str,
-                        help='Dataset to be Used')
-    parser.add_argument('--result_path', action='store', dest='result_path', default='neural_cls/results/',
-                        type=str, help='Path to Save/Load Result')
-    parser.add_argument('--usemodel', default='CNN', type=str, dest='usemodel',
-                        help='Model to Use')
-    parser.add_argument('--worddim', default=300, type=int, dest='worddim',
-                        help="Word Embedding Dimension")
-    parser.add_argument('--pretrnd', default="wordvectors/glove.6B.300d.txt", type=str, dest='pretrnd',
-                        help="Location of pretrained embeddings")
-    parser.add_argument('--reload', default=0, type=int, dest='reload',
-                        help="Reload the last saved model")
-    parser.add_argument('--checkpoint', default=".", type=str, dest='checkpoint',
-                        help="Location of trained Model")
-    opt = parser.parse_args()
-    # config.parameters = OrderedDict()
-    config.parameters['model'] = opt.usemodel
-    config.parameters['wrdim'] = opt.worddim
-    config.parameters['ptrnd'] = opt.pretrnd
-    if opt.usemodel == 'BiLSTM' and opt.dataset == 'trec':
+    os.chdir(hydra.utils.get_original_cwd())
+
+    usemodel = config.parameters['model']
+    use_dataset = config.parameters.dataset
+    if usemodel == 'BiLSTM' and use_dataset == 'trec':
         config.parameters['dpout'] = 0.5
         config.parameters['wldim'] = 200
         config.parameters['nepch'] = 10
-
         config.parameters['lrate'] = 0.001
         config.parameters['batch_size'] = 50
         config.parameters['opsiz'] = 7
 
-    elif opt.usemodel == 'BiLSTM' and opt.dataset == 'mareview':
+    elif usemodel == 'BiLSTM' and use_dataset == 'mareview':
         config.parameters['dpout'] = 0.5
         config.parameters['wldim'] = 200
         config.parameters['nepch'] = 5
-
         config.parameters['lrate'] = 0.001
         config.parameters['batch_size'] = 50
         config.parameters['opsiz'] = 2
 
-    elif opt.usemodel == 'CNN' and opt.dataset == 'trec':
+    elif usemodel == 'CNN' and use_dataset == 'trec':
         config.parameters['dpout'] = 0.5
         config.parameters['wlchl'] = 100
         config.parameters['nepch'] = 15
-
         config.parameters['lrate'] = 0.001
         config.parameters['batch_size'] = 50
         config.parameters['opsiz'] = 7
 
-    elif opt.usemodel == 'CNN' and opt.dataset == 'mareview':
+    elif usemodel == 'CNN' and use_dataset == 'mareview':
         config.parameters['dpout'] = 0.5
         config.parameters['wlchl'] = 100
         config.parameters['nepch'] = 5
-
         config.parameters['lrate'] = 0.001
         config.parameters['batch_size'] = 50
         config.parameters['opsiz'] = 2
 
-    elif opt.usemodel == 'CNN_BB' and opt.dataset == 'trec':
+    elif usemodel == 'CNN_BB' and use_dataset == 'trec':
         config.parameters['wlchl'] = 100
         config.parameters['nepch'] = 10
-
         config.parameters['lrate'] = 0.001
         config.parameters['batch_size'] = 50
         config.parameters['opsiz'] = 7
         config.parameters['sigmp'] = float(np.exp(-3))
 
-    elif opt.usemodel == 'CNN_BB' and opt.dataset == 'mareview':
+    elif usemodel == 'CNN_BB' and use_dataset == 'mareview':
         config.parameters['wlchl'] = 100
         config.parameters['nepch'] = 5
-
         config.parameters['lrate'] = 0.001
         config.parameters['batch_size'] = 50
         config.parameters['opsiz'] = 2
@@ -97,24 +73,22 @@ def main(config):
 
     else:
         raise NotImplementedError()
-    use_dataset = opt.dataset
     dataset_path = os.path.join('datasets', use_dataset)
-    result_path = os.path.join(opt.result_path, use_dataset)
-    model_name = opt.usemodel
-    model_load = opt.reload
+    result_path = os.path.join(config.parameters.result_path, use_dataset)
+    model_load = config.opt.reload
 
 
     loader = Loader()
-    print('Model:', model_name)
+    print('Model:', usemodel)
     print('Dataset:', use_dataset)
     if not os.path.exists(result_path):
         os.makedirs(result_path)
-    if not os.path.exists(os.path.join(result_path, model_name)):
-        os.makedirs(os.path.join(result_path, model_name))
-    if opt.dataset == 'trec':
+    if not os.path.exists(os.path.join(result_path, usemodel)):
+        os.makedirs(os.path.join(result_path, usemodel))
+    if use_dataset == 'trec':
         train_data, test_data, mappings = loader.load_trec(dataset_path, config.parameters['ptrnd'],
                                                            config.parameters['wrdim'])
-    elif opt.dataset == 'mareview':
+    elif use_dataset == 'mareview':
         train_data, test_data, mappings = loader.load_mareview(dataset_path, config.parameters['ptrnd'],
                                                                config.parameters['wrdim'])
     else:
@@ -125,11 +99,11 @@ def main(config):
     print('Load Complete')
     if model_load:
         print('Loading Saved Weights....................................................................')
-        model_path = os.path.join(result_path, model_name, opt.checkpoint, 'modelweights')
+        model_path = os.path.join(result_path, usemodel, opt.checkpoint, 'modelweights')
         model = torch.load(model_path)
     else:
         print('Building Model............................................................................')
-        if (model_name == 'BiLSTM'):
+        if (usemodel == 'BiLSTM'):
             print('BiLSTM')
             word_vocab_size = len(word_to_id)
             word_embedding_dim = config.parameters['wrdim']
@@ -139,7 +113,7 @@ def main(config):
             model = BiLSTM(word_vocab_size, word_embedding_dim, word_hidden_dim,
                            output_size, pretrained=word_embeds)
 
-        elif (model_name == 'CNN'):
+        elif (usemodel == 'CNN'):
             print('CNN')
             word_vocab_size = len(word_to_id)
             word_embedding_dim = config.parameters['wrdim']
@@ -149,7 +123,7 @@ def main(config):
             model = CNN(word_vocab_size, word_embedding_dim, word_out_channels,
                         output_size, pretrained=word_embeds)
 
-        elif (model_name == 'CNN_BB'):
+        elif (usemodel == 'CNN_BB'):
             print('CNN_BB')
             word_vocab_size = len(word_to_id)
             word_embedding_dim = config.parameters['wrdim']
@@ -163,14 +137,12 @@ def main(config):
     learning_rate = config.parameters['lrate']
     num_epochs = config.parameters['nepch']
     print('Initial learning rate is: %s' % (learning_rate))
-    optimizer = torch.optim.Adam(model.config.parameters(), lr=learning_rate)
-    trainer = Trainer(model, optimizer, result_path, model_name, tag_to_id, usedataset=opt.dataset)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    trainer = Trainer(model, optimizer, result_path, usemodel, tag_to_id, usedataset=use_dataset)
     losses, all_F = trainer.train_model(num_epochs, train_data, test_data, learning_rate,
                                         batch_size=config.parameters['batch_size'])
     plt.plot(losses)
-    plt.savefig(os.path.join(result_path, model_name, 'lossplot.png'))
-
-
+    plt.savefig(os.path.join(result_path, usemodel, 'lossplot.png'))
 
 
 if __name__ == '__main__':
