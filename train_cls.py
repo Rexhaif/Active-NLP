@@ -37,7 +37,7 @@ def main(config):
     parser.add_argument('--checkpoint', default=".", type=str, dest='checkpoint',
                         help="Location of trained Model")
     opt = parser.parse_args()
-    config.parameters = OrderedDict()
+    # config.parameters = OrderedDict()
     config.parameters['model'] = opt.usemodel
     config.parameters['wrdim'] = opt.worddim
     config.parameters['ptrnd'] = opt.pretrnd
