@@ -14,6 +14,15 @@ import torch
 from active_learning import Acquisition_CLS
 import pickle as pkl
 import numpy as np
+import wandb
+import datetime
+import random
+
+def seed_everything(seed: int):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
 
 import argparse
 
@@ -37,6 +46,7 @@ parser.add_argument('--initdata', default=2, type=int, dest='initdata',
                     help="Percentage of Data to being with")
 parser.add_argument('--acquiremethod', default='random', type=str, dest='acquiremethod',
                     help="Percentage of Data to Acquire from Rest of Training Set")
+parser.add_argument('--seed', type=int, default=42)
 
 parameters = OrderedDict()
 
@@ -45,6 +55,16 @@ opt = parser.parse_args()
 parameters['model'] = opt.usemodel
 parameters['wrdim'] = opt.worddim
 parameters['ptrnd'] = opt.pretrnd
+
+seed_everything(opt.seed)
+
+wandb.init(
+    project="al-mts",
+    entity="skoltech-nlp",
+    group=f'AL/{opt.usemodel}/{opt.acquiremethod}',
+    name=f'{opt.seed}',
+    config=opt
+)
 
 if opt.usemodel == 'CNN' and opt.dataset == 'trec':
     parameters['dpout'] = 0.5
@@ -327,6 +347,9 @@ for acquire_percent in acquisition_strat:
     
     print ('*'*100)
     saved_epoch = np.argmax(np.array([item[1] for item in all_F]))
+    wandb.log({
+        'test_f1': all_F[saved_epoch][1]
+    })
     print ('Budget Exhausted: %d, Best F on Train %.3f, Best F on Test %.3f' %(sentences_acquired,
                                                     all_F[saved_epoch][0], all_F[saved_epoch][1]))
     print ('*'*100)

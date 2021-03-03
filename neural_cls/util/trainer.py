@@ -5,9 +5,7 @@ from neural_cls.util.evaluator import Evaluator  #
 import sys
 import os
 import numpy as np
-np.random.seed(0)
 import torch
-torch.manual_seed(0)
 import torch.nn as nn
 from neural_cls.util.utils import *
 
